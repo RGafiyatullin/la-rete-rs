@@ -11,9 +11,6 @@ use la_rete::json::parse_ruleset as parse_json_ruleset;
 
 #[derive(Debug, Fail)]
 enum Failure {
-    #[fail(display = "Failure::Unimplemented: {}", _0)]
-    Unimplemented(&'static str),
-
     #[fail(display = "Failure::RulesetParseError: {}", _0)]
     RulesetParseError(#[cause] serde_json::Error),
 

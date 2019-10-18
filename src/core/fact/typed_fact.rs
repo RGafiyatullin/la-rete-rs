@@ -3,8 +3,6 @@ use std::sync::Arc;
 
 use super::FactsRow;
 use super::FactsTable;
-use super::ForkTable;
-use super::HEq;
 use super::HEqTable;
 use super::Property;
 use super::Trie;
@@ -102,13 +100,11 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
         match *self {
             Self::PropertyIsEq {
                 ref property,
-                ref value,
                 ..
             } => build_trie_fork_eq(Arc::clone(&property), fact_rows, fallback),
 
             Self::PropertyIsNEq {
                 ref property,
-                ref value,
                 ..
             } => build_trie_fork_neq::<In, K, P>(Arc::clone(&property), fact_rows, fallback),
         }
@@ -116,12 +112,11 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
     fn add_fact_to_group(
         &self,
         groups: Box<dyn std::any::Any>,
-        fact: Arc<dyn Fact<In>>,
+        _fact: Arc<dyn Fact<In>>,
         facts_row: FactsRow<In>,
     ) -> Box<dyn std::any::Any> {
         match *self {
             Self::PropertyIsEq {
-                ref property,
                 ref value,
                 ..
             } => {
@@ -138,8 +133,6 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
             }
 
             Self::PropertyIsNEq {
-                ref property,
-                ref value,
                 ..
             } => unreachable!("An attempt to insert a non-fork fact into the fact-groups table"),
         }
@@ -185,7 +178,7 @@ fn build_trie_fork_eq<In: 'static, K: 'static, P: Property<In, K> + 'static>(
 }
 
 fn build_trie_fork_neq<In: 'static, K: 'static, P: Property<In, K> + 'static>(
-    property: Arc<P>,
+    _property: Arc<P>,
     fact_rows: Vec<FactsRow<In>>,
     fallback: FactsTable<In>,
 ) -> Result<Trie<In>, TrieBuildFailure> {
