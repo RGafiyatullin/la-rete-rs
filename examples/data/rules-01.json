@@ -1,0 +1,265 @@
+[
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "presence"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "available"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "unavailable"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "availability-presence"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "presence"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "subscribe"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "unsubscribe"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "subscribed"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "unsubscribed"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "subscription-presence"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "presence"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "probe"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "probe-presence"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "presence"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "error"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "error-presence"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "message"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "normal"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "chat"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "groupchat"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "headline"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "ok-message"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "message"
+                    }
+                },
+                {
+                    "eq": {
+                        "path": "subtype",
+                        "value": "error"
+                    }
+                },
+                {
+                    "neq": {
+                        "path": "error/safe",
+                        "value": true
+                    }
+                }
+            ]
+        },
+        "then": "error-message-has-no-marker"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "message"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "error"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "error-message"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "iq"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "get"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "set"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "request-iq"
+    },
+    {
+        "if": {
+            "and": [
+                {
+                    "eq": {
+                        "path": "type",
+                        "value": "iq"
+                    }
+                },
+                {
+                    "or": [
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "result"
+                            }
+                        },
+                        {
+                            "eq": {
+                                "path": "subtype",
+                                "value": "error"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "then": "response-iq"
+    }
+]

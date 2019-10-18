@@ -1,0 +1,21 @@
+{}
+{"type": "presence", "subtype": "available"}
+{"type": "presence", "subtype": "unavailable"}
+{"type": "presence", "subtype": "subscribe"}
+{"type": "presence", "subtype": "unsubscribe"}
+{"type": "presence", "subtype": "subscribed"}
+{"type": "presence", "subtype": "unsubscribed"}
+{"type": "presence", "subtype": "error"}
+{"type": "presence", "subtype": "probe"}
+{"type": "message", "subtype": "normal"}
+{"type": "message", "subtype": "chat"}
+{"type": "message", "subtype": "groupchat"}
+{"type": "message", "subtype": "headline"}
+{"type": "message", "subtype": "error"}
+{"type": "message", "subtype": "error", "error": {"safe": "true"}}
+{"type": "message", "subtype": "error", "error": {"safe": true}}
+{"type": "iq", "subtype": "get"}
+{"type": "iq", "subtype": "set"}
+{"type": "iq", "subtype": "result"}
+{"type": "iq", "subtype": "error"}
+{"type": "other"}

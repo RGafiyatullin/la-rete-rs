@@ -1,0 +1,23 @@
+Ruleset parsed
+Ruleset compiled
+Match result: None
+Match result: Some(String("availability-presence"))
+Match result: Some(String("availability-presence"))
+Match result: Some(String("subscription-presence"))
+Match result: Some(String("subscription-presence"))
+Match result: Some(String("subscription-presence"))
+Match result: Some(String("subscription-presence"))
+Match result: Some(String("error-presence"))
+Match result: Some(String("probe-presence"))
+Match result: Some(String("ok-message"))
+Match result: Some(String("ok-message"))
+Match result: Some(String("ok-message"))
+Match result: Some(String("ok-message"))
+Match result: Some(String("error-message-has-no-marker"))
+Match result: Some(String("error-message-has-no-marker"))
+Match result: Some(String("error-message"))
+Match result: Some(String("request-iq"))
+Match result: Some(String("request-iq"))
+Match result: Some(String("response-iq"))
+Match result: Some(String("response-iq"))
+Match result: None

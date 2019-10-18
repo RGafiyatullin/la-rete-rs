@@ -1,0 +1,17 @@
+[package]
+name = "la-rete"
+version = "0.1.0"
+authors = ["Roman Gafiyatullin <r.gafiyatullin@me.com>"]
+edition = "2018"
+license = "MIT"
+description = "A reasonably simple rule-matching engine"
+repository = "https://github.com/RGafiyatullin/la-rete-rs/"
+
+[dependencies]
+failure = "^0.1"
+log = "^0.4"
+json-utils = "^0.3"
+lazy_static = "^1.4"
+serde = {version = "^1.0", features = ["derive"]}
+serde_json = "^1.0"
+
