@@ -37,7 +37,7 @@ impl<In, K, P: Property<In, K>> TypedFact<In, K, P> {
         }
     }
 
-    pub fn proeprty_is_neq(property: P, value: K) -> Self {
+    pub fn property_is_neq(property: P, value: K) -> Self {
         let property = Arc::new(property);
         let value = Arc::new(value);
         let property_id = format!(
@@ -98,15 +98,13 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
         fallback: FactsTable<In>,
     ) -> Result<Trie<In>, TrieBuildFailure> {
         match *self {
-            Self::PropertyIsEq {
-                ref property,
-                ..
-            } => build_trie_fork_eq(Arc::clone(&property), fact_rows, fallback),
+            Self::PropertyIsEq { ref property, .. } => {
+                build_trie_fork_eq(Arc::clone(&property), fact_rows, fallback)
+            }
 
-            Self::PropertyIsNEq {
-                ref property,
-                ..
-            } => build_trie_fork_neq::<In, K, P>(Arc::clone(&property), fact_rows, fallback),
+            Self::PropertyIsNEq { ref property, .. } => {
+                build_trie_fork_neq::<In, K, P>(Arc::clone(&property), fact_rows, fallback)
+            }
         }
     }
     fn add_fact_to_group(
@@ -116,10 +114,7 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
         facts_row: FactsRow<In>,
     ) -> Box<dyn std::any::Any> {
         match *self {
-            Self::PropertyIsEq {
-                ref value,
-                ..
-            } => {
+            Self::PropertyIsEq { ref value, .. } => {
                 let mut groups: Box<HEqTable<K, Vec<FactsRow<In>>>> = groups
                     .downcast()
                     .expect("Failed to downcast groups from std::any::Any");
@@ -132,9 +127,9 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
                 groups
             }
 
-            Self::PropertyIsNEq {
-                ..
-            } => unreachable!("An attempt to insert a non-fork fact into the fact-groups table"),
+            Self::PropertyIsNEq { .. } => {
+                unreachable!("An attempt to insert a non-fork fact into the fact-groups table")
+            }
         }
     }
 }
@@ -182,17 +177,21 @@ fn build_trie_fork_neq<In: 'static, K: 'static, P: Property<In, K> + 'static>(
     fact_rows: Vec<FactsRow<In>>,
     fallback: FactsTable<In>,
 ) -> Result<Trie<In>, TrieBuildFailure> {
-
     let mut head_acc = Vec::new();
     let mut tail_acc = Vec::new();
 
     for mut fact_row in fact_rows {
-        let head_fact = fact_row.pop_fact().expect("Expected fact_row to contain at least one fact");
+        let head_fact = fact_row
+            .pop_fact()
+            .expect("Expected fact_row to contain at least one fact");
         head_acc.push(head_fact);
         tail_acc.push(fact_row);
     }
 
-    let fact = head_acc.into_iter().next().expect("Expected head_acc to contain at least one fact");
+    let fact = head_acc
+        .into_iter()
+        .next()
+        .expect("Expected head_acc to contain at least one fact");
     let facts_table = FactsTable::from_rows(tail_acc);
     let sub_trie = facts_table.into_trie()?;
     let sub_trie = Box::new(sub_trie);
@@ -205,6 +204,6 @@ fn build_trie_fork_neq<In: 'static, K: 'static, P: Property<In, K> + 'static>(
         then: sub_trie,
         fallback,
     };
-    
+
     Ok(trie)
 }

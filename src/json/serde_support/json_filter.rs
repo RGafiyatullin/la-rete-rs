@@ -2,7 +2,7 @@ use json_utils::json::JsValue;
 
 use crate::core::fact::TypedFact;
 use crate::core::ruleset::*;
-use crate::json::JsPath;
+use crate::json::std;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum JsonFilter {
@@ -22,18 +22,8 @@ pub enum JsonFilter {
 impl JsonFilter {
     pub fn into_filter(self) -> Filter<JsValue> {
         match self {
-            Self::Eq { path, value } => {
-                let path = parse_path(&path);
-                let property = JsPath::from_path(path);
-                let fact = TypedFact::property_is_eq(property, value);
-                Filter::Fact(Box::new(fact))
-            }
-            Self::Neq { path, value } => {
-                let path = parse_path(&path);
-                let property = JsPath::from_path(path);
-                let fact = TypedFact::proeprty_is_neq(property, value);
-                Filter::Fact(Box::new(fact))
-            }
+            Self::Eq { path, value } => Filter::Fact(Box::new(std::eq(parse_path(&path), value))),
+            Self::Neq { path, value } => Filter::Fact(Box::new(std::neq(parse_path(&path), value))),
             Self::And(filters) => {
                 Filter::And(filters.into_iter().map(|jf| jf.into_filter()).collect())
             }

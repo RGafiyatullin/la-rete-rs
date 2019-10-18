@@ -8,5 +8,7 @@ pub use js_value_heq::JsValueHEq;
 #[cfg(test)]
 mod js_path_tests;
 
+pub mod std;
+
 mod serde_support;
 pub use serde_support::parse_ruleset;

@@ -17,6 +17,8 @@ mod macros;
 pub mod core;
 pub mod json;
 
+pub mod prelude;
+
 // pub mod core;
 // pub mod json;
 // pub mod matchers;
