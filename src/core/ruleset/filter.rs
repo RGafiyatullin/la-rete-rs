@@ -13,6 +13,18 @@ impl<In> Filter<In> {
         Self::And(vec![])
     }
 
+    pub fn fact<F: Fact<In> + 'static>(fact: F) -> Self {
+        Filter::Fact(Box::new(fact))
+    }
+
+    pub fn and(self, other: Self) -> Self {
+        Filter::And(vec![self, other])
+    }
+
+    pub fn or(self, other: Self) -> Self {
+        Filter::Or(vec![self, other])
+    }
+
     pub fn into_table(self) -> Vec<Vec<Arc<dyn Fact<In>>>> {
         into_table(vec![vec![]], self)
     }

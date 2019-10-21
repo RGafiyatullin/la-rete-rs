@@ -7,6 +7,9 @@ extern crate failure;
 #[macro_use]
 extern crate serde;
 
+#[macro_use]
+extern crate derive_new;
+
 #[cfg(test)]
 #[macro_use]
 extern crate serde_json;

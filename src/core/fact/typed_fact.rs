@@ -1,15 +1,15 @@
 use std::marker::PhantomData;
 use std::sync::Arc;
 
+use super::Fact;
 use super::FactsRow;
 use super::FactsTable;
 use super::HEqTable;
+use super::Predicate;
 use super::Property;
 use super::Trie;
 use super::TrieBuildFailure;
 use super::TypedForkTable;
-
-use super::Fact;
 
 pub enum TypedFact<In, K, P: Property<In, K>> {
     PropertyIsEq {
@@ -21,6 +21,12 @@ pub enum TypedFact<In, K, P: Property<In, K>> {
         property_id: String,
         property: Arc<P>,
         value: Arc<K>,
+        pd: PhantomData<In>,
+    },
+    Predicate {
+        property_id: String,
+        property: Arc<P>,
+        predicate: Arc<dyn Predicate<K>>,
         pd: PhantomData<In>,
     },
 }
@@ -53,6 +59,24 @@ impl<In, K, P: Property<In, K>> TypedFact<In, K, P> {
             pd: PhantomData,
         }
     }
+
+    pub fn predicate<F: Predicate<K> + 'static>(property: P, predicate: F) -> Self {
+        use rand::RngCore;
+
+        let mut rng = rand::thread_rng();
+        let rand = rng.next_u64();
+
+        let property = Arc::new(property);
+        let property_id = format!("TypedFact::Predicate__{}", rand);
+        let predicate = Arc::new(predicate);
+
+        Self::Predicate {
+            property_id,
+            property,
+            predicate,
+            pd: PhantomData,
+        }
+    }
 }
 
 impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFact<In, K, P> {
@@ -60,6 +84,9 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
         match *self {
             Self::PropertyIsEq { ref property, .. } => property.id(),
             Self::PropertyIsNEq {
+                ref property_id, ..
+            } => property_id.clone(),
+            Self::Predicate {
                 ref property_id, ..
             } => property_id.clone(),
         }
@@ -73,6 +100,7 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
                 ..
             } => Some(property.heq().calc_hash(value)),
             Self::PropertyIsNEq { .. } => None,
+            Self::Predicate { .. } => None,
         }
     }
 
@@ -89,6 +117,12 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
                 ref value,
                 ..
             } => !property.heq().are_eq(property.value(input).as_ref(), value),
+
+            Self::Predicate {
+                ref property,
+                ref predicate,
+                ..
+            } => predicate.apply(property.value(input).as_ref()),
         }
     }
 
@@ -99,12 +133,14 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
     ) -> Result<Trie<In>, TrieBuildFailure> {
         match *self {
             Self::PropertyIsEq { ref property, .. } => {
-                build_trie_fork_eq(Arc::clone(&property), fact_rows, fallback)
+                build_trie_fork_eq(Arc::clone(property), fact_rows, fallback)
             }
 
             Self::PropertyIsNEq { ref property, .. } => {
-                build_trie_fork_neq::<In, K, P>(Arc::clone(&property), fact_rows, fallback)
+                build_trie_fork_neq::<In, K, P>(Arc::clone(property), fact_rows, fallback)
             }
+
+            Self::Predicate { .. } => build_trie_dumb_node(fact_rows, fallback),
         }
     }
     fn add_fact_to_group(
@@ -127,9 +163,7 @@ impl<In: 'static, K: 'static, P: Property<In, K> + 'static> Fact<In> for TypedFa
                 groups
             }
 
-            Self::PropertyIsNEq { .. } => {
-                unreachable!("An attempt to insert a non-fork fact into the fact-groups table")
-            }
+            _ => unreachable!("An attempt to insert a non-fork fact into the fact-groups table"),
         }
     }
 }
@@ -205,5 +239,33 @@ fn build_trie_fork_neq<In: 'static, K: 'static, P: Property<In, K> + 'static>(
         fallback,
     };
 
+    Ok(trie)
+}
+
+fn build_trie_dumb_node<In: 'static>(
+    fact_rows: Vec<FactsRow<In>>,
+    fallback: FactsTable<In>,
+) -> Result<Trie<In>, TrieBuildFailure> {
+    assert!(fact_rows.len() == 1);
+    let mut head_row = fact_rows
+        .into_iter()
+        .next()
+        .expect("Previous assertion failed (fact_rows.len() == 1)");
+    let head_fact = head_row
+        .pop_fact()
+        .expect("Expected fact row to contain at least one fact");
+
+    let facts_table = FactsTable::from_rows(vec![head_row]);
+    let sub_trie = facts_table.into_trie()?;
+    let sub_trie = Box::new(sub_trie);
+
+    let fallback = fallback.into_trie()?;
+    let fallback = Box::new(fallback);
+
+    let trie = Trie::Dumb {
+        fact: head_fact,
+        then: sub_trie,
+        fallback,
+    };
     Ok(trie)
 }

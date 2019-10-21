@@ -12,3 +12,6 @@ pub mod std;
 
 mod serde_support;
 pub use serde_support::parse_ruleset;
+
+#[cfg(test)]
+mod tests;

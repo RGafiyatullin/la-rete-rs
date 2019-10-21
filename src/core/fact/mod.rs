@@ -11,3 +11,6 @@ pub use fact::Fact;
 
 mod typed_fact;
 pub use typed_fact::TypedFact;
+
+mod predicate;
+pub use predicate::Predicate;
